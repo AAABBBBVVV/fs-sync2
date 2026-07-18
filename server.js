@@ -102,6 +102,7 @@ const server = http.createServer(async (req, res) => {
 
             // Inject before </head> (before main app scripts)
             html = html.replace('</head>', injectHtml + '</head>');
+            html = html.replace('</body>', '<script src="/sync-runtime.js"></script></body>');
             content = Buffer.from(html, 'utf8');
         }
 
@@ -119,6 +120,7 @@ const server = http.createServer(async (req, res) => {
             }
             injectHtml += '<script src="/sync-client.js"></script>';
             html = html.replace('</head>', injectHtml + '</head>');
+            html = html.replace('</body>', '<script src="/sync-runtime.js"></script></body>');
             res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
             res.end(html);
         } catch (f) { res.writeHead(404); res.end('Not found'); }
