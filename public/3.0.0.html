@@ -6143,6 +6143,26 @@ loadFeishuConfig();
         window.closeHistoryDetail = closeHistoryDetail;
         window.deleteHistoryRecord = deleteHistoryRecord;
         window.exportHistoryToExcel = exportHistoryToExcel;
+        // 暴露内部变量给 sync-runtime（跨设备无缝同步用）
+        window.__rooms = rooms;
+        window.__rules = rules;
+        window.__products = products;
+        window.__historyRecords = historyRecords;
+        window.__nextRoomId = nextRoomId;
+        window.__nextRuleId = nextRuleId;
+        window.__nextProductId = nextProductId;
+        window.__nextHistoryId = nextHistoryId;
+        window.__nextLogId = nextLogId;
+        window.__logs = logs;
+        window.__saveDataToCache = saveDataToCache;
+        window.__updateRoomStats = updateRoomStats;
+        window.__renderDashboardCards = renderDashboardCards;
+        window.__renderRoomsTable = renderRoomsTable;
+        window.__renderRules = renderRules;
+        window.__renderProducts = renderProducts;
+        window.__renderHistoryTable = renderHistoryTable;
+        window.__addLog = addLog;
+
 
         console.log('✅ 系统已启动！房间管理统计卡片已移除，其他功能正常。');
     </script>
