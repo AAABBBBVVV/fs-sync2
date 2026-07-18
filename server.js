@@ -19,7 +19,10 @@ function injectSync(html) {
     if (serverData) head += '<script>window.__SERVER_DATA__=' + JSON.stringify(serverData) + ';</script>';
     head += '<script src="/sync-client.js"></script>';
     html = html.replace('</head>', head + '</head>');
-    html = html.replace('</body>', '<script src="/sync-runtime.js"></script></body>');
+    var idx = html.lastIndexOf('</body>');
+    if (idx !== -1) {
+        html = html.slice(0, idx) + '<script src="/sync-runtime.js"></script>' + html.slice(idx);
+    }
     return html;
 }
 
