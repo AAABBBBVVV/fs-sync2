@@ -3542,6 +3542,14 @@
                     logs
                 };
                 localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+                // 有网时同步到服务端，无网则用本地缓存
+                if (typeof navigator === 'undefined' || navigator.onLine !== false) {
+                    fetch('/api/sync/save', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chess_room_data: data })
+                    }).catch(function(){});
+                }
             } catch (e) {
                 console.warn('缓存保存失败', e);
             }
@@ -3558,6 +3566,26 @@
                 console.warn('缓存加载失败', e);
                 return null;
             }
+        }
+
+        }
+
+        // ===== 从服务端拉取最新数据（有网时） =====
+        function loadFromServer() {
+            if (typeof navigator !== 'undefined' && navigator.onLine === false) return;
+            fetch('/api/sync/load').then(function(r){return r.json()}).then(function(sd){
+                if (!sd || !sd.chess_room_data) return;
+                var d = sd.chess_room_data;
+                if (!d.rooms || !d.rules || !d.products || !d.historyRecords) return;
+                rooms = d.rooms; rules = d.rules; products = d.products;
+                historyRecords = d.historyRecords;
+                nextRoomId = d.nextRoomId || 1; nextRuleId = d.nextRuleId || 1;
+                nextProductId = d.nextProductId || 1; nextHistoryId = d.nextHistoryId || 1;
+                nextLogId = d.nextLogId || 1; logs = d.logs || [];
+                updateRoomStats(); renderDashboardCards(); renderRoomsTable();
+                renderRules(); renderProducts(); renderHistoryTable();
+                saveDataToCache();
+            }).catch(function(){});
         }
 
         function manualCache() {
@@ -3919,6 +3947,7 @@
             startAutoSave();
             startTimerUpdate();
             saveDataToCache();
+            loadFromServer();
         }
 
         // ================================================================
@@ -4054,6 +4083,7 @@
             'products': 'view-products', 'history': 'view-history' };
 
         function switchView(viewName) {
+            loadFromServer();
             document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
             const target = document.getElementById(viewMap[viewName]);
             if (target) target.classList.add('active');
